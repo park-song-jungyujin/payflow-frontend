@@ -1,0 +1,59 @@
+name: Deploy payflow-web
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write # WIF — 키 없이 이 토큰으로 GCP에 인증한다
+
+env:
+  PROJECT_ID: payflow-hackathon-2026
+  REGION: asia-northeast3
+  # backend/infra의 terraform output ci_web_workload_identity_provider / ci_web_deployer_service_account
+  WIF_PROVIDER: projects/1095757595735/locations/global/workloadIdentityPools/github-actions/providers/payflow-frontend
+  DEPLOY_SA: payflow-web-deployer@payflow-hackathon-2026.iam.gserviceaccount.com
+  RUNTIME_SA: payflow-web@payflow-hackathon-2026.iam.gserviceaccount.com
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # next build가 .next/types를 생성한다 — typecheck가 LayoutProps 같은 라우트 타입을
+      # 보려면 build가 먼저 돌아야 한다.
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: |
+          gcloud run deploy payflow-web \
+            --source . \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --service-account "$RUNTIME_SA" \
+            --quiet
