@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+type SettlementRun = { settlement_run_id: string; status: string };
 
 // TODO(B): 대시보드(정산 기간 선택 · 실행 트리거 버튼), 자연어 입력창 → 필터 확인 카드,
 // 요약 카드(정산 명세 + 위험 알림 렌더), OpenAPI 타입 생성 파이프라인 — plan.md Track B "web"
@@ -10,6 +12,13 @@ export default function Home() {
   const [runId, setRunId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [runs, setRuns] = useState<SettlementRun[]>([]);
+
+  useEffect(() => {
+    fetch("/api/settlements")
+      .then((res) => res.json())
+      .then((body) => setRuns(body.settlement_runs ?? []));
+  }, [result]);
 
   async function handleApprove() {
     setLoading(true);
@@ -30,6 +39,15 @@ export default function Home() {
   return (
     <main>
       <h1>Payflow</h1>
+      <ul>
+        {runs.map((run) => (
+          <li key={run.settlement_run_id}>
+            <button type="button" onClick={() => setRunId(run.settlement_run_id)}>
+              {run.settlement_run_id} ({run.status})
+            </button>
+          </li>
+        ))}
+      </ul>
       <p>
         <label htmlFor="run-id">settlement_run_id</label>
         <br />
