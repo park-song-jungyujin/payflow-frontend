@@ -1,66 +1,65 @@
-"use client";
+import Link from "next/link";
+import NewRunForm from "./new-run-form";
+import { formatMinor } from "@/lib/money";
+import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
+import type { SettlementRunListItem } from "@/types/settlement";
 
-import { useEffect, useState } from "react";
+// Server Component — 결정 3: 목록 조회는 API_BASE_URL을 직접 부른다(BFF route
+// handler를 안 거친다). 부수효과 없는 GET이라 서버 컴포넌트 렌더 중에 바로
+// fetch하는 게 왕복을 하나 줄인다. /api/settlements(기존 BFF route)는 안
+// 건드리고 그대로 둔다 — 클라이언트 쪽에서 필요해질 때를 위해 남겨둔다.
+async function getSettlements(): Promise<SettlementRunListItem[]> {
+  const apiBase = process.env.API_BASE_URL;
+  if (!apiBase) return [];
 
-type SettlementRun = { settlement_run_id: string; status: string };
+  const res = await fetch(`${apiBase}/settlements`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const body = await res.json();
+  return body.settlement_runs ?? [];
+}
 
-// TODO(B): 대시보드(정산 기간 선택 · 실행 트리거 버튼), 자연어 입력창 → 필터 확인 카드,
-// 요약 카드(정산 명세 + 위험 알림 렌더), OpenAPI 타입 생성 파이프라인 — plan.md Track B "web"
-// 절 참조. 여기는 사람 승인 게이트(POST /settlements/runs/{run_id}/approve) 버튼 하나만
-// A/C의 E2E 확인용으로 최소 동작시켜 둔 자리다.
-export default function Home() {
-  const [runId, setRunId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
-  const [runs, setRuns] = useState<SettlementRun[]>([]);
-
-  useEffect(() => {
-    fetch("/api/settlements")
-      .then((res) => res.json())
-      .then((body) => setRuns(body.settlement_runs ?? []));
-  }, [result]);
-
-  async function handleApprove() {
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await fetch(`/api/settlements/runs/${runId}/approve`, {
-        method: "POST",
-      });
-      const body = await res.json();
-      setResult(res.ok ? JSON.stringify(body, null, 2) : `error: ${JSON.stringify(body)}`);
-    } catch (e) {
-      setResult(`error: ${String(e)}`);
-    } finally {
-      setLoading(false);
-    }
-  }
+export default async function Home() {
+  const runs = await getSettlements();
 
   return (
     <main>
       <h1>Payflow</h1>
-      <ul>
-        {runs.map((run) => (
-          <li key={run.settlement_run_id}>
-            <button type="button" onClick={() => setRunId(run.settlement_run_id)}>
-              {run.settlement_run_id} ({run.status})
-            </button>
-          </li>
-        ))}
-      </ul>
-      <p>
-        <label htmlFor="run-id">settlement_run_id</label>
-        <br />
-        <input
-          id="run-id"
-          value={runId}
-          onChange={(e) => setRunId(e.target.value)}
-        />
-      </p>
-      <button onClick={handleApprove} disabled={loading || !runId}>
-        승인
-      </button>
-      {result && <pre>{result}</pre>}
+
+      <section>
+        <h2>정산 실행 목록</h2>
+        {runs.length === 0 ? (
+          <p>정산 실행이 없습니다.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>상태</th>
+                <th>총액</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {runs.map((run) => (
+                <tr key={run.settlement_run_id}>
+                  <td>{run.settlement_run_id}</td>
+                  <td style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
+                    {SETTLEMENT_STATUS_LABEL[run.status]}
+                  </td>
+                  <td>{formatMinor(run.total_amount_minor, run.base_currency)}</td>
+                  <td>
+                    <Link href={`/runs/${run.settlement_run_id}`}>상세 보기</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section>
+        <NewRunForm />
+      </section>
     </main>
   );
 }
