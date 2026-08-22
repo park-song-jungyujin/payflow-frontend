@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NewRunForm from "./new-run-form";
 import { formatMinor } from "@/lib/money";
+import { authHeaders } from "@/lib/session";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRunListItem } from "@/types/settlement";
 
@@ -12,7 +13,10 @@ async function getSettlements(): Promise<SettlementRunListItem[]> {
   const apiBase = process.env.API_BASE_URL;
   if (!apiBase) return [];
 
-  const res = await fetch(`${apiBase}/settlements`, { cache: "no-store" });
+  const res = await fetch(`${apiBase}/settlements`, {
+    cache: "no-store",
+    headers: await authHeaders(),
+  });
   if (!res.ok) return [];
   const body = await res.json();
   return body.settlement_runs ?? [];
@@ -23,6 +27,9 @@ export default async function Home() {
 
   return (
     <main>
+      <p style={{ textAlign: "right" }}>
+        <a href="/api/auth/logout">로그아웃</a>
+      </p>
       <h1>Payflow</h1>
 
       <section>

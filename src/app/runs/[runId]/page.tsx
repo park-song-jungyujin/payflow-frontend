@@ -4,6 +4,7 @@ import ApproveButton from "./approve-button";
 import StatusPoller from "./status-poller";
 import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
 import { formatMinor } from "@/lib/money";
+import { authHeaders } from "@/lib/session";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRun } from "@/types/settlement";
 
@@ -14,7 +15,10 @@ async function getRun(runId: string): Promise<SettlementRun | null> {
   const apiBase = process.env.API_BASE_URL;
   if (!apiBase) return null;
 
-  const res = await fetch(`${apiBase}/settlements/runs/${runId}`, { cache: "no-store" });
+  const res = await fetch(`${apiBase}/settlements/runs/${runId}`, {
+    cache: "no-store",
+    headers: await authHeaders(),
+  });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`failed to load run: ${res.status}`);
   return res.json();
