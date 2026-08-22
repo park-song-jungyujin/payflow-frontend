@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authHeadersFromRequest } from "@/lib/session";
 
 // 승인 카드 — schema-contract.md §7 승인 토큰 흐름을 이 route handler 안에서
 // 끝낸다. approve가 평문으로 한 번 내주는 토큰을 이 함수 스코프 밖으로
@@ -8,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 // 아니다 — 토큰 자체가 10분 TTL·금액 해시 바인딩·1회용으로 지연 없이 바로
 // 소비되도록 설계돼 있다(money-safety.md).
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ runId: string }> }
 ) {
   const { runId } = await params;
@@ -17,9 +18,10 @@ export async function POST(
     return NextResponse.json({ error: "API_BASE_URL not set" }, { status: 500 });
   }
 
+  const session = authHeadersFromRequest(req);
   const approveRes = await fetch(`${apiBase}/settlements/runs/${runId}/approve`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...session },
     body: JSON.stringify({}),
   });
   const approveBody = await approveRes.json();

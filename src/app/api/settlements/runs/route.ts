@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authHeadersFromRequest } from "@/lib/session";
 import type { SettlementFilter } from "@/types/settlement";
 
 // 얇은 BFF 프록시 — 필터를 그대로 감싸 넘긴다. 후보 조회·검증·매칭·enqueue는
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
 
   const res = await fetch(`${apiBase}/settlements/runs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeadersFromRequest(req) },
     body: JSON.stringify({ filter }),
   });
   const body = await res.json();
