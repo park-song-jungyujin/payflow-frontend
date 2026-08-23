@@ -189,6 +189,7 @@ th.amount {
   font-weight: 600;
   border: 1px solid currentColor;
   background: color-mix(in srgb, currentColor 12%, transparent);
+  white-space: nowrap;
 }
 
 /* --- anomaly list --- */
