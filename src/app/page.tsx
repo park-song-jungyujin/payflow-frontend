@@ -1,5 +1,7 @@
 import Link from "next/link";
 import NewRunForm from "./new-run-form";
+import { t } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 import { formatMinor } from "@/lib/money";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRunListItem } from "@/types/settlement";
@@ -19,26 +21,27 @@ async function getSettlements(): Promise<SettlementRunListItem[]> {
 }
 
 export default async function Home() {
-  const runs = await getSettlements();
+  const [runs, locale] = await Promise.all([getSettlements(), getLocale()]);
+  const s = t(locale);
 
   return (
     <main className="page">
       <div className="page-header">
         <h1>Payflow</h1>
-        <span className="card-muted">정산 관리자 대시보드</span>
+        <span className="card-muted">{s.subtitle}</span>
       </div>
 
       <section>
-        <h2>정산 실행 목록</h2>
+        <h2>{s.runListTitle}</h2>
         {runs.length === 0 ? (
-          <p className="card card-muted">정산 실행이 없습니다.</p>
+          <p className="card card-muted">{s.noRuns}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>상태</th>
-                <th className="amount">총액</th>
+                <th>{s.colId}</th>
+                <th>{s.colStatus}</th>
+                <th className="amount">{s.colAmount}</th>
                 <th></th>
               </tr>
             </thead>
@@ -48,12 +51,12 @@ export default async function Home() {
                   <td>{run.settlement_run_id}</td>
                   <td>
                     <span className="badge" style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
-                      {SETTLEMENT_STATUS_LABEL[run.status]}
+                      {SETTLEMENT_STATUS_LABEL[locale][run.status]}
                     </span>
                   </td>
                   <td className="amount">{formatMinor(run.total_amount_minor, run.base_currency)}</td>
                   <td>
-                    <Link href={`/runs/${run.settlement_run_id}`}>상세 보기</Link>
+                    <Link href={`/runs/${run.settlement_run_id}`}>{s.detailLink}</Link>
                   </td>
                 </tr>
               ))}
@@ -63,7 +66,7 @@ export default async function Home() {
       </section>
 
       <section>
-        <NewRunForm />
+        <NewRunForm locale={locale} />
       </section>
     </main>
   );

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { t, type Locale } from "@/lib/i18n";
 
 // 결정 1 — 이 버튼은 /api/settlements/runs/[runId]/approve 하나만 부른다.
 // 승인+송금 체이닝은 그 route handler 안에서 끝난다. 이 컴포넌트는 토큰을
@@ -10,11 +11,14 @@ export default function ApproveButton({
   runId,
   disabled,
   disabledReason,
+  locale,
 }: {
   runId: string;
   disabled: boolean;
   disabledReason?: string;
+  locale: Locale;
 }) {
+  const s = t(locale);
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,12 +30,12 @@ export default function ApproveButton({
       const res = await fetch(`/api/settlements/runs/${runId}/approve`, { method: "POST" });
       const body = await res.json();
       if (!res.ok) {
-        setError(body.detail ?? body.error ?? `승인 실패 (${res.status})`);
+        setError(body.detail ?? body.error ?? s.approveFailed(res.status));
         return;
       }
       router.refresh();
     } catch {
-      setError("승인 처리 중 네트워크 오류가 발생했습니다.");
+      setError(s.approveNetworkError);
     } finally {
       setSubmitting(false);
     }
@@ -40,7 +44,7 @@ export default function ApproveButton({
   return (
     <div className="card">
       <button onClick={handleClick} disabled={disabled || submitting} title={disabledReason}>
-        {submitting ? "처리 중..." : "최종 승인 및 송금 실행"}
+        {submitting ? s.approving : s.approveButton}
       </button>
       {disabled && disabledReason && <p className="hint">{disabledReason}</p>}
       {error && <p role="alert">{error}</p>}

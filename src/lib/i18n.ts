@@ -1,0 +1,92 @@
+// 최소 i18n. 라이브러리 없이 정적 딕셔너리 + 쿠키만으로 구현한다(해커톤
+// 범위 — next-intl 같은 라우팅 기반 i18n은 지금 필요한 것보다 크다).
+// 기본값은 en이다(영어권 사용자가 1순위, 오른쪽 위 버튼으로 ko 전환).
+// 서버 컴포넌트는 lib/locale.ts의 getLocale()(next/headers 씀)로 쿠키를 읽고,
+// 클라이언트 컴포넌트는 그 값을 prop으로 내려받는다 — next/headers는 클라
+// 컴포넌트에서 import 자체가 안 되므로 이 파일은 next/headers에 의존하지 않는다.
+
+export const LOCALES = ["en", "ko"] as const;
+export type Locale = (typeof LOCALES)[number];
+export const DEFAULT_LOCALE: Locale = "en";
+export const LOCALE_COOKIE = "locale";
+
+export const dict = {
+  en: {
+    subtitle: "Settlement Admin Dashboard",
+    runListTitle: "Settlement Runs",
+    noRuns: "No settlement runs yet.",
+    colId: "ID",
+    colStatus: "Status",
+    colAmount: "Amount",
+    detailLink: "View",
+    newRunTitle: "New Settlement Run",
+    periodStart: "Start date",
+    periodEnd: "End date",
+    categoriesLegend: "Account categories (all if none selected)",
+    creating: "Creating...",
+    createRun: "Create Run",
+    createFailed: (status: number) => `Failed to create run (${status})`,
+    createNetworkError: "Network error while creating the run.",
+    backToList: "← Back to list",
+    statusLabel: "Status",
+    totalLabel: "Total",
+    draftHint: "(Provisional total — recalculated with the exchange rate at approval time.)",
+    claimsTitle: "Claim Details",
+    noClaims: "No claims linked to this run.",
+    colMerchant: "Merchant",
+    colTxDate: "Date",
+    colCategory: "Category",
+    anomalyTitle: "Anomaly Review (Executor Agent)",
+    analysisPending: "Analysis pending",
+    noAnomalies: "No anomalies found",
+    exportLink: "Download XLSX for accountant",
+    approveTitle: "Approval",
+    approveButton: "Approve & Send Payout",
+    approving: "Processing...",
+    approveFailed: (status: number) => `Approval failed (${status})`,
+    approveNetworkError: "Network error during approval.",
+    noRecipientsReason: "No linked claims — cannot approve.",
+    multiRecipientReason: "This batch has 2+ recipients — automatic payout isn't supported yet.",
+  },
+  ko: {
+    subtitle: "정산 관리자 대시보드",
+    runListTitle: "정산 실행 목록",
+    noRuns: "정산 실행이 없습니다.",
+    colId: "ID",
+    colStatus: "상태",
+    colAmount: "총액",
+    detailLink: "상세 보기",
+    newRunTitle: "새 정산 실행",
+    periodStart: "시작일",
+    periodEnd: "종료일",
+    categoriesLegend: "계정과목 (선택 안 하면 전체)",
+    creating: "생성 중...",
+    createRun: "정산 실행 생성",
+    createFailed: (status: number) => `실행 생성 실패 (${status})`,
+    createNetworkError: "실행 생성 중 네트워크 오류가 발생했습니다.",
+    backToList: "← 목록으로",
+    statusLabel: "상태",
+    totalLabel: "총액",
+    draftHint: "(승인 전 잠정치 — 승인 시점 환율로 다시 계산됩니다)",
+    claimsTitle: "정산 명세",
+    noClaims: "연결된 청구 항목이 없습니다.",
+    colMerchant: "가맹점",
+    colTxDate: "거래일",
+    colCategory: "계정과목",
+    anomalyTitle: "이상 징후 (집행자 에이전트)",
+    analysisPending: "분석 대기 중",
+    noAnomalies: "이상 없음",
+    exportLink: "세무사 전달용 XLSX 다운로드",
+    approveTitle: "승인",
+    approveButton: "최종 승인 및 송금 실행",
+    approving: "처리 중...",
+    approveFailed: (status: number) => `승인 실패 (${status})`,
+    approveNetworkError: "승인 처리 중 네트워크 오류가 발생했습니다.",
+    noRecipientsReason: "연결된 청구 항목이 없어 승인할 수 없습니다.",
+    multiRecipientReason: "이 배치는 수취인이 2명 이상이라 아직 자동 송금을 지원하지 않습니다.",
+  },
+} as const satisfies Record<Locale, Record<string, string | ((n: number) => string)>>;
+
+export function t(locale: Locale) {
+  return dict[locale];
+}
