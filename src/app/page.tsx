@@ -1,8 +1,8 @@
-import Link from "next/link";
 import NewRunForm from "./new-run-form";
-import { formatMinor } from "@/lib/money";
+import RunsTable from "./runs-table";
+import { t } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 import { authHeaders } from "@/lib/session";
-import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRunListItem } from "@/types/settlement";
 
 // Server Component — 결정 3: 목록 조회는 API_BASE_URL을 직접 부른다(BFF route
@@ -19,53 +19,38 @@ async function getSettlements(): Promise<SettlementRunListItem[]> {
   });
   if (!res.ok) return [];
   const body = await res.json();
-  return body.settlement_runs ?? [];
+  const runs: SettlementRunListItem[] = body.settlement_runs ?? [];
+  // 백엔드가 정렬 없이 반환하므로 여기서 최신순으로 정렬한다.
+  return runs.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 }
 
 export default async function Home() {
-  const runs = await getSettlements();
+  const [runs, locale] = await Promise.all([getSettlements(), getLocale()]);
+  const s = t(locale);
 
   return (
-    <main>
+    <main className="page">
       <p style={{ textAlign: "right" }}>
         <a href="/api/auth/logout">로그아웃</a>
       </p>
-      <h1>Payflow</h1>
+      <div className="page-header">
+        <h1>Payflow</h1>
+        <span className="card-muted">{s.subtitle}</span>
+      </div>
 
       <section>
-        <h2>정산 실행 목록</h2>
+        <h2>{s.runListTitle}</h2>
         {runs.length === 0 ? (
-          <p>정산 실행이 없습니다.</p>
+          <p className="card card-muted">{s.noRuns}</p>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>상태</th>
-                <th>총액</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {runs.map((run) => (
-                <tr key={run.settlement_run_id}>
-                  <td>{run.settlement_run_id}</td>
-                  <td style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
-                    {SETTLEMENT_STATUS_LABEL[run.status]}
-                  </td>
-                  <td>{formatMinor(run.total_amount_minor, run.base_currency)}</td>
-                  <td>
-                    <Link href={`/runs/${run.settlement_run_id}`}>상세 보기</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <RunsTable runs={runs} locale={locale} />
         )}
       </section>
 
       <section>
-        <NewRunForm />
+        <NewRunForm locale={locale} />
       </section>
     </main>
   );

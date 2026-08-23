@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import LanguageSwitcher from "./language-switcher";
 import "./globals.css";
+import { getLocale } from "@/lib/locale";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,10 +19,14 @@ export const metadata: Metadata = {
   description: "Payflow",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
+        <LanguageSwitcher locale={locale} />
+        {children}
+      </body>
     </html>
   );
 }

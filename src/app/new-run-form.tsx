@@ -7,13 +7,17 @@ import {
   ACCOUNT_CATEGORY_LABEL,
   type AccountCategoryCode,
 } from "@/lib/accountCategory";
+import { t, type Locale } from "@/lib/i18n";
 import type { SettlementFilter, SettlementRun } from "@/types/settlement";
 
 // 새 정산 실행 폼. 결정 2 — 자연어 입력은 없다, 폼 필드만. 결정 4 — recipient_ids는
 // 뺐다(GET /recipients 없음). 클라이언트 컴포넌트인 이유: onSubmit·state가
 // 필요하다 — 부수효과 있는 액션은 BFF route handler를 거친다는 원칙 그대로,
 // 여기서 직접 API_BASE_URL을 부르지 않고 /api/settlements/runs를 부른다.
-export default function NewRunForm() {
+// locale은 부모 서버 컴포넌트가 쿠키에서 읽어 prop으로 내려준다 — 클라이언트
+// 컴포넌트는 next/headers를 못 쓴다.
+export default function NewRunForm({ locale }: { locale: Locale }) {
+  const s = t(locale);
   const router = useRouter();
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
@@ -49,13 +53,13 @@ export default function NewRunForm() {
       });
       const body = await res.json();
       if (!res.ok) {
-        setError(body.detail ?? body.error ?? `실행 생성 실패 (${res.status})`);
+        setError(body.detail ?? body.error ?? s.createFailed(res.status));
         return;
       }
       const run = body as SettlementRun;
       router.push(`/runs/${run.settlement_run_id}`);
     } catch {
-      setError("실행 생성 중 네트워크 오류가 발생했습니다.");
+      setError(s.createNetworkError);
     } finally {
       setSubmitting(false);
     }
@@ -63,42 +67,44 @@ export default function NewRunForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>새 정산 실행</h2>
-      <p>
-        <label htmlFor="period-start">시작일</label>
-        <br />
+      <h2>{s.newRunTitle}</h2>
+      <div className="field">
+        <label htmlFor="period-start">{s.periodStart}</label>
         <input
           id="period-start"
           type="date"
+          lang={locale}
           value={periodStart}
           onChange={(e) => setPeriodStart(e.target.value)}
         />
-      </p>
-      <p>
-        <label htmlFor="period-end">종료일</label>
-        <br />
+      </div>
+      <div className="field">
+        <label htmlFor="period-end">{s.periodEnd}</label>
         <input
           id="period-end"
           type="date"
+          lang={locale}
           value={periodEnd}
           onChange={(e) => setPeriodEnd(e.target.value)}
         />
-      </p>
+      </div>
       <fieldset>
-        <legend>계정과목 (선택 안 하면 전체)</legend>
-        {ACCOUNT_CATEGORIES.map((code) => (
-          <label key={code} style={{ display: "block" }}>
-            <input
-              type="checkbox"
-              checked={categories.has(code)}
-              onChange={() => toggleCategory(code)}
-            />
-            {ACCOUNT_CATEGORY_LABEL[code]}
-          </label>
-        ))}
+        <legend>{s.categoriesLegend}</legend>
+        <div className="checkbox-grid">
+          {ACCOUNT_CATEGORIES.map((code) => (
+            <label key={code}>
+              <input
+                type="checkbox"
+                checked={categories.has(code)}
+                onChange={() => toggleCategory(code)}
+              />
+              {ACCOUNT_CATEGORY_LABEL[locale][code]}
+            </label>
+          ))}
+        </div>
       </fieldset>
       <button type="submit" disabled={submitting}>
-        {submitting ? "생성 중..." : "정산 실행 생성"}
+        {submitting ? s.creating : s.createRun}
       </button>
       {error && <p role="alert">{error}</p>}
     </form>

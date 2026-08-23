@@ -22,6 +22,7 @@ export interface SettlementFilter {
 export interface ClaimSummary {
   claim_id: string;
   recipient_id: string;
+  recipient_name: string;
   amount_minor: number;
   currency: string;
   account_category_code: AccountCategoryCode;
@@ -32,6 +33,11 @@ export interface ClaimSummary {
 export interface ExecutorAnalysis {
   anomalies: string[];
   summary_text: string | null;
+  // 영어 사용자용 병행 필드. anomalies_en은 anomalies와 같은 개수·순서(백엔드가
+  // 없는 draft엔 빈 리스트/null로 기본값을 채운다 — settlements/routes.py
+  // _executor_analysis 참조).
+  anomalies_en: string[];
+  summary_text_en: string | null;
   created_at: string;
 }
 
@@ -55,6 +61,8 @@ export interface SettlementRun {
   updated_at: string;
   executor_analysis: ExecutorAnalysis | null;
   claims: ClaimSummary[];
+  // 이 run에 링크된 claim들의 recipient.display_name 중복 제거 목록(정렬됨).
+  recipient_names: string[];
 }
 
 // GET /settlements 목록 항목 — claims·executor_analysis 없이 run 문서 그대로.
