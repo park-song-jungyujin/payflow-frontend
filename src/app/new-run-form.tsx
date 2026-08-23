@@ -73,6 +73,7 @@ export default function NewRunForm({ locale }: { locale: Locale }) {
         <input
           id="period-start"
           type="date"
+          lang={locale}
           value={periodStart}
           onChange={(e) => setPeriodStart(e.target.value)}
         />
@@ -82,6 +83,7 @@ export default function NewRunForm({ locale }: { locale: Locale }) {
         <input
           id="period-end"
           type="date"
+          lang={locale}
           value={periodEnd}
           onChange={(e) => setPeriodEnd(e.target.value)}
         />
