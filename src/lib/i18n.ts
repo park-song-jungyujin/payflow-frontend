@@ -48,6 +48,7 @@ export const dict = {
     approveNetworkError: "Network error during approval.",
     noRecipientsReason: "No linked claims — cannot approve.",
     multiRecipientReason: "This batch has 2+ recipients — automatic payout isn't supported yet.",
+    showAll: (n: number) => `Show all (${n})`,
   },
   ko: {
     subtitle: "정산 관리자 대시보드",
@@ -86,6 +87,7 @@ export const dict = {
     approveNetworkError: "승인 처리 중 네트워크 오류가 발생했습니다.",
     noRecipientsReason: "연결된 청구 항목이 없어 승인할 수 없습니다.",
     multiRecipientReason: "이 배치는 수취인이 2명 이상이라 아직 자동 송금을 지원하지 않습니다.",
+    showAll: (n: number) => `모두 보기 (${n})`,
   },
 } as const satisfies Record<Locale, Record<string, string | ((n: number) => string)>>;
 
