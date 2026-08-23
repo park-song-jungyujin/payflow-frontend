@@ -5,7 +5,7 @@ import StatusPoller from "./status-poller";
 import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
 import { t } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
-import { formatMinor } from "@/lib/money";
+import { formatMinor, formatUsd } from "@/lib/money";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRun } from "@/types/settlement";
 
@@ -67,7 +67,9 @@ export default async function RunDetailPage({
           </span>
           <span>
             {s.totalLabel}:{" "}
-            <span className="value">{formatMinor(run.total_amount_minor, run.base_currency)}</span>
+            <span className="value">
+              {formatUsd(run.total_amount_minor, run.base_currency, run.fx_rates)}
+            </span>
           </span>
         </div>
         {run.status === "DRAFT" && <p className="hint">{s.draftHint}</p>}
@@ -94,7 +96,12 @@ export default async function RunDetailPage({
                   <td>{c.recipient_name}</td>
                   <td>{c.merchant_name ?? "-"}</td>
                   <td>{c.transaction_date ?? "-"}</td>
-                  <td className="amount">{formatMinor(c.amount_minor, c.currency)}</td>
+                  <td className="amount">
+                    {formatUsd(c.amount_minor, c.currency, run.fx_rates)}
+                    {c.currency === "KRW" && (
+                      <span className="hint"> ({formatMinor(c.amount_minor, c.currency)})</span>
+                    )}
+                  </td>
                   <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
                 </tr>
               ))}

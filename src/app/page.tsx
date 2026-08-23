@@ -2,7 +2,7 @@ import Link from "next/link";
 import NewRunForm from "./new-run-form";
 import { t } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
-import { formatMinor } from "@/lib/money";
+import { formatUsd } from "@/lib/money";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRunListItem } from "@/types/settlement";
 
@@ -55,7 +55,9 @@ export default async function Home() {
                       {SETTLEMENT_STATUS_LABEL[locale][run.status]}
                     </span>
                   </td>
-                  <td className="amount">{formatMinor(run.total_amount_minor, run.base_currency)}</td>
+                  <td className="amount">
+                    {formatUsd(run.total_amount_minor, run.base_currency, run.fx_rates)}
+                  </td>
                   <td>{run.recipient_names.join(", ") || "-"}</td>
                   <td>
                     <Link href={`/runs/${run.settlement_run_id}`}>{s.detailLink}</Link>
