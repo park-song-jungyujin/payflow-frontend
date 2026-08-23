@@ -15,7 +15,11 @@ async function getSettlements(): Promise<SettlementRunListItem[]> {
   const res = await fetch(`${apiBase}/settlements`, { cache: "no-store" });
   if (!res.ok) return [];
   const body = await res.json();
-  return body.settlement_runs ?? [];
+  const runs: SettlementRunListItem[] = body.settlement_runs ?? [];
+  // 백엔드가 정렬 없이 반환하므로 여기서 최신순으로 정렬한다.
+  return runs.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 }
 
 export default async function Home() {
