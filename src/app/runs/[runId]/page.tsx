@@ -47,6 +47,17 @@ export default async function RunDetailPage({
   const hasAnomalies =
     run.executor_analysis !== null && run.executor_analysis.anomalies.length > 0;
 
+  // agent가 anomalies_en/summary_text_en을 채우기 전에 쓰인 draft는 이 필드가
+  // 비어 있다 — 그럴 땐 en 선택 시에도 한국어로 대체 표시한다(빈 화면보다 낫다).
+  const displayedAnomalies =
+    locale === "en" && run.executor_analysis && run.executor_analysis.anomalies_en.length > 0
+      ? run.executor_analysis.anomalies_en
+      : (run.executor_analysis?.anomalies ?? []);
+  const displayedSummary =
+    locale === "en" && run.executor_analysis?.summary_text_en
+      ? run.executor_analysis.summary_text_en
+      : (run.executor_analysis?.summary_text ?? null);
+
   return (
     <main className="page">
       <Link href="/" className="back-link">
@@ -116,21 +127,19 @@ export default async function RunDetailPage({
           <p className="card card-muted">{s.analysisPending}</p>
         ) : (
           <div className={`card${hasAnomalies ? " anomaly-card" : ""}`}>
-            {run.executor_analysis.anomalies.length === 0 ? (
+            {displayedAnomalies.length === 0 ? (
               <p>
                 {s.noAnomalies}
-                {run.executor_analysis.summary_text ? ` — ${run.executor_analysis.summary_text}` : ""}
+                {displayedSummary ? ` — ${displayedSummary}` : ""}
               </p>
             ) : (
               <>
                 <ul>
-                  {run.executor_analysis.anomalies.map((anomaly, i) => (
+                  {displayedAnomalies.map((anomaly, i) => (
                     <li key={i}>{anomaly}</li>
                   ))}
                 </ul>
-                {run.executor_analysis.summary_text && (
-                  <p className="hint">{run.executor_analysis.summary_text}</p>
-                )}
+                {displayedSummary && <p className="hint">{displayedSummary}</p>}
               </>
             )}
           </div>

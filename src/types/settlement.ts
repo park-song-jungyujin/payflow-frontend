@@ -33,6 +33,11 @@ export interface ClaimSummary {
 export interface ExecutorAnalysis {
   anomalies: string[];
   summary_text: string | null;
+  // 영어 사용자용 병행 필드. anomalies_en은 anomalies와 같은 개수·순서(백엔드가
+  // 없는 draft엔 빈 리스트/null로 기본값을 채운다 — settlements/routes.py
+  // _executor_analysis 참조).
+  anomalies_en: string[];
+  summary_text_en: string | null;
   created_at: string;
 }
 
