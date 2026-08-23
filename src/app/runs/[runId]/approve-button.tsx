@@ -38,11 +38,11 @@ export default function ApproveButton({
   }
 
   return (
-    <div>
+    <div className="card">
       <button onClick={handleClick} disabled={disabled || submitting} title={disabledReason}>
         {submitting ? "처리 중..." : "최종 승인 및 송금 실행"}
       </button>
-      {disabled && disabledReason && <p>{disabledReason}</p>}
+      {disabled && disabledReason && <p className="hint">{disabledReason}</p>}
       {error && <p role="alert">{error}</p>}
     </div>
   );

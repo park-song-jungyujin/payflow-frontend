@@ -64,38 +64,38 @@ export default function NewRunForm() {
   return (
     <form onSubmit={handleSubmit}>
       <h2>새 정산 실행</h2>
-      <p>
+      <div className="field">
         <label htmlFor="period-start">시작일</label>
-        <br />
         <input
           id="period-start"
           type="date"
           value={periodStart}
           onChange={(e) => setPeriodStart(e.target.value)}
         />
-      </p>
-      <p>
+      </div>
+      <div className="field">
         <label htmlFor="period-end">종료일</label>
-        <br />
         <input
           id="period-end"
           type="date"
           value={periodEnd}
           onChange={(e) => setPeriodEnd(e.target.value)}
         />
-      </p>
+      </div>
       <fieldset>
         <legend>계정과목 (선택 안 하면 전체)</legend>
-        {ACCOUNT_CATEGORIES.map((code) => (
-          <label key={code} style={{ display: "block" }}>
-            <input
-              type="checkbox"
-              checked={categories.has(code)}
-              onChange={() => toggleCategory(code)}
-            />
-            {ACCOUNT_CATEGORY_LABEL[code]}
-          </label>
-        ))}
+        <div className="checkbox-grid">
+          {ACCOUNT_CATEGORIES.map((code) => (
+            <label key={code}>
+              <input
+                type="checkbox"
+                checked={categories.has(code)}
+                onChange={() => toggleCategory(code)}
+              />
+              {ACCOUNT_CATEGORY_LABEL[code]}
+            </label>
+          ))}
+        </div>
       </fieldset>
       <button type="submit" disabled={submitting}>
         {submitting ? "생성 중..." : "정산 실행 생성"}

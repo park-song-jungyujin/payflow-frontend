@@ -22,20 +22,23 @@ export default async function Home() {
   const runs = await getSettlements();
 
   return (
-    <main>
-      <h1>Payflow</h1>
+    <main className="page">
+      <div className="page-header">
+        <h1>Payflow</h1>
+        <span className="card-muted">정산 관리자 대시보드</span>
+      </div>
 
       <section>
         <h2>정산 실행 목록</h2>
         {runs.length === 0 ? (
-          <p>정산 실행이 없습니다.</p>
+          <p className="card card-muted">정산 실행이 없습니다.</p>
         ) : (
           <table>
             <thead>
               <tr>
                 <th>ID</th>
                 <th>상태</th>
-                <th>총액</th>
+                <th className="amount">총액</th>
                 <th></th>
               </tr>
             </thead>
@@ -43,10 +46,12 @@ export default async function Home() {
               {runs.map((run) => (
                 <tr key={run.settlement_run_id}>
                   <td>{run.settlement_run_id}</td>
-                  <td style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
-                    {SETTLEMENT_STATUS_LABEL[run.status]}
+                  <td>
+                    <span className="badge" style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
+                      {SETTLEMENT_STATUS_LABEL[run.status]}
+                    </span>
                   </td>
-                  <td>{formatMinor(run.total_amount_minor, run.base_currency)}</td>
+                  <td className="amount">{formatMinor(run.total_amount_minor, run.base_currency)}</td>
                   <td>
                     <Link href={`/runs/${run.settlement_run_id}`}>상세 보기</Link>
                   </td>

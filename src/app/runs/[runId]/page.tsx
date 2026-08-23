@@ -41,38 +41,47 @@ export default async function RunDetailPage({
 
   const canApprove = run.status === "DRAFT" || run.status === "FAILED";
 
+  const hasAnomalies =
+    run.executor_analysis !== null && run.executor_analysis.anomalies.length > 0;
+
   return (
-    <main>
-      <p>
-        <Link href="/">← 목록으로</Link>
-      </p>
-      <h1>{run.settlement_run_id}</h1>
+    <main className="page">
+      <Link href="/" className="back-link">
+        ← 목록으로
+      </Link>
+      <div className="page-header">
+        <h1>{run.settlement_run_id}</h1>
+      </div>
       <StatusPoller status={run.status} />
 
-      <section>
-        <p>
-          상태:{" "}
-          <span style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
-            {SETTLEMENT_STATUS_LABEL[run.status]}
+      <section className="card">
+        <div className="meta-row">
+          <span>
+            상태:{" "}
+            <span className="badge" style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
+              {SETTLEMENT_STATUS_LABEL[run.status]}
+            </span>
           </span>
-        </p>
-        <p>총액: {formatMinor(run.total_amount_minor, run.base_currency)}</p>
+          <span>
+            총액: <span className="value">{formatMinor(run.total_amount_minor, run.base_currency)}</span>
+          </span>
+        </div>
         {run.status === "DRAFT" && (
-          <p>(승인 전 잠정치 — 승인 시점 환율로 다시 계산됩니다)</p>
+          <p className="hint">(승인 전 잠정치 — 승인 시점 환율로 다시 계산됩니다)</p>
         )}
       </section>
 
       <section>
         <h2>정산 명세</h2>
         {run.claims.length === 0 ? (
-          <p>연결된 청구 항목이 없습니다.</p>
+          <p className="card card-muted">연결된 청구 항목이 없습니다.</p>
         ) : (
           <table>
             <thead>
               <tr>
                 <th>가맹점</th>
                 <th>거래일</th>
-                <th>금액</th>
+                <th className="amount">금액</th>
                 <th>계정과목</th>
               </tr>
             </thead>
@@ -81,7 +90,7 @@ export default async function RunDetailPage({
                 <tr key={c.claim_id}>
                   <td>{c.merchant_name ?? "-"}</td>
                   <td>{c.transaction_date ?? "-"}</td>
-                  <td>{formatMinor(c.amount_minor, c.currency)}</td>
+                  <td className="amount">{formatMinor(c.amount_minor, c.currency)}</td>
                   <td>{ACCOUNT_CATEGORY_LABEL[c.account_category_code]}</td>
                 </tr>
               ))}
@@ -93,23 +102,32 @@ export default async function RunDetailPage({
       <section>
         <h2>이상 징후 (집행자 에이전트)</h2>
         {run.executor_analysis === null ? (
-          <p>분석 대기 중</p>
-        ) : run.executor_analysis.anomalies.length === 0 ? (
-          <p>이상 없음{run.executor_analysis.summary_text ? ` — ${run.executor_analysis.summary_text}` : ""}</p>
+          <p className="card card-muted">분석 대기 중</p>
         ) : (
-          <>
-            <ul>
-              {run.executor_analysis.anomalies.map((anomaly, i) => (
-                <li key={i}>{anomaly}</li>
-              ))}
-            </ul>
-            {run.executor_analysis.summary_text && <p>{run.executor_analysis.summary_text}</p>}
-          </>
+          <div className={`card${hasAnomalies ? " anomaly-card" : ""}`}>
+            {run.executor_analysis.anomalies.length === 0 ? (
+              <p>
+                이상 없음
+                {run.executor_analysis.summary_text ? ` — ${run.executor_analysis.summary_text}` : ""}
+              </p>
+            ) : (
+              <>
+                <ul>
+                  {run.executor_analysis.anomalies.map((anomaly, i) => (
+                    <li key={i}>{anomaly}</li>
+                  ))}
+                </ul>
+                {run.executor_analysis.summary_text && (
+                  <p className="hint">{run.executor_analysis.summary_text}</p>
+                )}
+              </>
+            )}
+          </div>
         )}
       </section>
 
       <section>
-        <a href={`/api/settlements/runs/${run.settlement_run_id}/export`}>
+        <a className="btn-outline" href={`/api/settlements/runs/${run.settlement_run_id}/export`}>
           세무사 전달용 XLSX 다운로드
         </a>
       </section>
