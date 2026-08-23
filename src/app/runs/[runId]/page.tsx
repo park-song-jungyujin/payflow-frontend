@@ -81,6 +81,7 @@ export default async function RunDetailPage({
           <table>
             <thead>
               <tr>
+                <th>{s.colRequester}</th>
                 <th>{s.colMerchant}</th>
                 <th>{s.colTxDate}</th>
                 <th className="amount">{s.colAmount}</th>
@@ -90,6 +91,7 @@ export default async function RunDetailPage({
             <tbody>
               {run.claims.map((c) => (
                 <tr key={c.claim_id}>
+                  <td>{c.recipient_name}</td>
                   <td>{c.merchant_name ?? "-"}</td>
                   <td>{c.transaction_date ?? "-"}</td>
                   <td className="amount">{formatMinor(c.amount_minor, c.currency)}</td>

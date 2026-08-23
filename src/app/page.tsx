@@ -42,6 +42,7 @@ export default async function Home() {
                 <th>{s.colId}</th>
                 <th>{s.colStatus}</th>
                 <th className="amount">{s.colAmount}</th>
+                <th>{s.colRequester}</th>
                 <th></th>
               </tr>
             </thead>
@@ -55,6 +56,7 @@ export default async function Home() {
                     </span>
                   </td>
                   <td className="amount">{formatMinor(run.total_amount_minor, run.base_currency)}</td>
+                  <td>{run.recipient_names.join(", ") || "-"}</td>
                   <td>
                     <Link href={`/runs/${run.settlement_run_id}`}>{s.detailLink}</Link>
                   </td>

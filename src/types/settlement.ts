@@ -22,6 +22,7 @@ export interface SettlementFilter {
 export interface ClaimSummary {
   claim_id: string;
   recipient_id: string;
+  recipient_name: string;
   amount_minor: number;
   currency: string;
   account_category_code: AccountCategoryCode;
@@ -55,6 +56,8 @@ export interface SettlementRun {
   updated_at: string;
   executor_analysis: ExecutorAnalysis | null;
   claims: ClaimSummary[];
+  // 이 run에 링크된 claim들의 recipient.display_name 중복 제거 목록(정렬됨).
+  recipient_names: string[];
 }
 
 // GET /settlements 목록 항목 — claims·executor_analysis 없이 run 문서 그대로.
