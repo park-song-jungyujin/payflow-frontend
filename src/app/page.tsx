@@ -53,9 +53,6 @@ export default async function Home() {
 
   return (
     <main className="page page-wide">
-      <p style={{ textAlign: "right" }}>
-        <a href="/api/auth/logout">로그아웃</a>
-      </p>
       <div className="page-header">
         <h1>Payflow</h1>
         <span className="card-muted">{s.subtitle}</span>
