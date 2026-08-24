@@ -25,7 +25,7 @@ export default function RunsTable({
       <table>
         <thead>
           <tr>
-            <th>{s.colId}</th>
+            <th>{s.colNo}</th>
             <th>{s.colStatus}</th>
             <th className="amount">{s.colAmount}</th>
             <th>{s.colRequester}</th>
@@ -33,9 +33,9 @@ export default function RunsTable({
           </tr>
         </thead>
         <tbody>
-          {visibleRuns.map((run) => (
+          {visibleRuns.map((run, i) => (
             <tr key={run.settlement_run_id}>
-              <td>{run.settlement_run_id}</td>
+              <td>{i + 1}</td>
               <td>
                 <span className="badge" style={{ color: SETTLEMENT_STATUS_COLOR[run.status] }}>
                   {SETTLEMENT_STATUS_LABEL[locale][run.status]}
