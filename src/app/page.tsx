@@ -3,6 +3,7 @@ import RunsTable from "./runs-table";
 import UnsettledClaimsList from "./unsettled-claims-list";
 import { t } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
+import { authHeaders } from "@/lib/session";
 import type { ClaimSummary, SettlementRunListItem } from "@/types/settlement";
 
 // Server Component — 결정 3: 목록 조회는 API_BASE_URL을 직접 부른다(BFF route
@@ -13,7 +14,10 @@ async function getSettlements(): Promise<SettlementRunListItem[]> {
   const apiBase = process.env.API_BASE_URL;
   if (!apiBase) return [];
 
-  const res = await fetch(`${apiBase}/settlements`, { cache: "no-store" });
+  const res = await fetch(`${apiBase}/settlements`, {
+    cache: "no-store",
+    headers: await authHeaders(),
+  });
   if (!res.ok) return [];
   const body = await res.json();
   const runs: SettlementRunListItem[] = body.settlement_runs ?? [];
@@ -24,12 +28,16 @@ async function getSettlements(): Promise<SettlementRunListItem[]> {
 }
 
 // 왼쪽 파트 — 아직 정산 실행에 안 들어간 확정 청구. GET /settlements/runs와
-// 같은 이유로 API_BASE_URL을 직접 부른다.
+// 같은 이유로 API_BASE_URL을 직접 부른다. 이 엔드포인트도 세션 인증을 요구한다
+// (org 스코핑) — authHeaders() 없이 부르면 401로 빈 배열만 받는다.
 async function getUnsettledClaims(): Promise<ClaimSummary[]> {
   const apiBase = process.env.API_BASE_URL;
   if (!apiBase) return [];
 
-  const res = await fetch(`${apiBase}/settlements/unsettled-claims`, { cache: "no-store" });
+  const res = await fetch(`${apiBase}/settlements/unsettled-claims`, {
+    cache: "no-store",
+    headers: await authHeaders(),
+  });
   if (!res.ok) return [];
   const body = await res.json();
   return body.claims ?? [];
@@ -45,6 +53,9 @@ export default async function Home() {
 
   return (
     <main className="page page-wide">
+      <p style={{ textAlign: "right" }}>
+        <a href="/api/auth/logout">로그아웃</a>
+      </p>
       <div className="page-header">
         <h1>Payflow</h1>
         <span className="card-muted">{s.subtitle}</span>
