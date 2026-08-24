@@ -19,6 +19,11 @@ export interface SettlementFilter {
   exclude_claim_ids?: string[] | null;
 }
 
+export interface ReceiptItem {
+  name: string;
+  amount_minor: number | null;
+}
+
 export interface ClaimSummary {
   claim_id: string;
   recipient_id: string;
@@ -28,6 +33,7 @@ export interface ClaimSummary {
   account_category_code: AccountCategoryCode;
   merchant_name: string | null;
   transaction_date: string | null;
+  items: ReceiptItem[];
 }
 
 export interface ExecutorAnalysis {

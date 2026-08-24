@@ -192,6 +192,20 @@ th.amount {
   white-space: nowrap;
 }
 
+/* --- receipt item list (claims table) --- */
+
+.item-list {
+  margin: 4px 0 0 1.1em;
+  padding: 0;
+  list-style: disc;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.item-list li {
+  margin-top: 2px;
+}
+
 /* --- anomaly list --- */
 
 .anomaly-card {
