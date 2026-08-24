@@ -77,6 +77,13 @@ export default async function Home() {
           <section>
             <NewRunForm locale={locale} />
           </section>
+
+          <section>
+            <h2>{s.slackConnectTitle}</h2>
+            <a href="/api/auth/slack/install">
+              <button type="button">{s.slackConnectButton}</button>
+            </a>
+          </section>
         </aside>
       </div>
     </main>
