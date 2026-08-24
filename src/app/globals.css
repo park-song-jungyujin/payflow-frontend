@@ -218,16 +218,46 @@ th.amount {
 
 /* --- receipt item list (claims table) --- */
 
+/* claim-row가 뒤따르는 item-row와 시각적으로 한 그룹임을 보여주려고 경계선을
+   합친다 — item-row 쪽에만 아래 경계선을 남긴다. */
+tr.claim-row.has-items td {
+  border-bottom: none;
+}
+
+tr.item-row td {
+  padding: 0 14px 10px;
+  background: color-mix(in srgb, var(--border) 20%, transparent);
+}
+
 .item-list {
-  margin: 4px 0 0 1.1em;
-  padding: 0;
-  list-style: disc;
-  color: var(--text-muted);
-  font-size: 0.85rem;
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
 }
 
 .item-list li {
-  margin-top: 2px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 2px 0 2px 1.6em;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  position: relative;
+}
+
+.item-list li::before {
+  content: "–";
+  position: absolute;
+  left: 0.5em;
+}
+
+.item-name {
+  flex: 1;
+}
+
+.item-amount {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- anomaly list --- */
