@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getLocale } from "@/lib/locale";
 
 export const metadata: Metadata = {
@@ -12,9 +13,9 @@ export default async function PrivacyPage() {
 
   return (
     <main className="page" style={{ maxWidth: 760 }}>
-      <a href="/" className="back-link">
+      <Link href="/" className="back-link">
         {isKo ? "← 홈으로 돌아가기" : "← Back to Home"}
-      </a>
+      </Link>
 
       <div className="page-header">
         <div>

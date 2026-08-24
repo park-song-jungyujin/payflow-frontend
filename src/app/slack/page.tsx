@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getLocale } from "@/lib/locale";
 
 export const metadata: Metadata = {
@@ -12,9 +13,9 @@ export default async function SlackInstallLandingPage() {
 
   return (
     <main className="page" style={{ maxWidth: 840 }}>
-      <a href="/" className="back-link">
+      <Link href="/" className="back-link">
         {isKo ? "← 관리자 대시보드" : "← Admin Dashboard"}
-      </a>
+      </Link>
 
       {/* Hero Section */}
       <section style={{ textAlign: "center", padding: "32px 0 24px" }}>
@@ -195,7 +196,7 @@ export default async function SlackInstallLandingPage() {
         <div style={{ display: "flex", gap: "16px" }}>
           <a href="/privacy">{isKo ? "개인정보처리방침" : "Privacy Policy"}</a>
           <a href="/support">{isKo ? "고객지원" : "Support"}</a>
-          <a href="/">{isKo ? "대시보드" : "Dashboard"}</a>
+          <Link href="/">{isKo ? "대시보드" : "Dashboard"}</Link>
         </div>
       </footer>
     </main>

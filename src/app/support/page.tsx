@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getLocale } from "@/lib/locale";
 
 export const metadata: Metadata = {
@@ -12,9 +13,9 @@ export default async function SupportPage() {
 
   return (
     <main className="page" style={{ maxWidth: 760 }}>
-      <a href="/" className="back-link">
+      <Link href="/" className="back-link">
         {isKo ? "← 홈으로 돌아가기" : "← Back to Home"}
-      </a>
+      </Link>
 
       <div className="page-header">
         <div>
@@ -103,9 +104,9 @@ export default async function SupportPage() {
                 : "Install Payflow to your workspace and automate your organization's entire expense lifecycle in minutes."}
             </p>
             <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-              <a href="/slack">
+              <Link href="/slack">
                 <button type="button">{isKo ? "Slack에 앱 설치하기" : "Install to Slack"}</button>
-              </a>
+              </Link>
               <a href="/privacy" className="btn-outline" style={{ display: "inline-flex", alignItems: "center" }}>
                 {isKo ? "개인정보처리방침" : "Privacy Policy"}
               </a>
