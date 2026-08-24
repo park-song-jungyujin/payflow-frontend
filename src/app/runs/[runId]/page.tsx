@@ -36,15 +36,11 @@ export default async function RunDetailPage({
   if (run === null) notFound();
   const s = t(locale);
 
-  // 결정 6 — 다중 수취인 run은 /payouts가 501을 낸다(get_sole_recipient_id).
-  // 근본 해결은 backend 몫이라 여기서는 안내만 한다.
+  // 결정 6 — 다중 수취인 run 501 게이트(get_sole_recipient_id)는 backend에서
+  // 제거됐다(feat/multi-recipient-payout, PR #25) — 이제 recipient당 item으로
+  // 단일 배치 전송을 지원하므로 여기서 더 이상 막지 않는다.
   const recipientIds = new Set(run.claims.map((c) => c.recipient_id));
-  let disabledReason: string | undefined;
-  if (recipientIds.size === 0) {
-    disabledReason = s.noRecipientsReason;
-  } else if (recipientIds.size > 1) {
-    disabledReason = s.multiRecipientReason;
-  }
+  const disabledReason = recipientIds.size === 0 ? s.noRecipientsReason : undefined;
 
   const canApprove = run.status === "DRAFT" || run.status === "FAILED";
 
