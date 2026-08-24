@@ -13,11 +13,19 @@ export async function GET(req: NextRequest) {
   if (!apiBase) {
     return NextResponse.json({ error: "API_BASE_URL not set" }, { status: 500 });
   }
+
+  // Cloud Run에서 req.nextUrl.origin이 컨테이너 내부 바인딩 주소
+  // (http://localhost:8080)로 나온다 — 로그인 페이지가 Google에 보낸
+  // redirect_uri(window.location.origin 기반)와 달라져서 Google 토큰 교환이
+  // redirect_uri_mismatch로 거부된다. PUBLIC_APP_URL을 배포 시점에 고정해
+  // 두 값을 일치시킨다. 로컬 dev는 이 값이 없으니 기존대로 origin을 쓴다.
+  const appOrigin = process.env.PUBLIC_APP_URL || req.nextUrl.origin;
+
   if (!code) {
-    return NextResponse.redirect(new URL("/login?error=missing_code", req.url));
+    return NextResponse.redirect(new URL("/login?error=missing_code", appOrigin));
   }
 
-  const redirectUri = `${req.nextUrl.origin}/api/auth/google/callback`;
+  const redirectUri = `${appOrigin}/api/auth/google/callback`;
   const res = await fetch(`${apiBase}/auth/google/callback`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -27,16 +35,16 @@ export async function GET(req: NextRequest) {
 
   if (!res.ok) {
     const message = encodeURIComponent(body.detail ?? "login_failed");
-    return NextResponse.redirect(new URL(`/login?error=${message}`, req.url));
+    return NextResponse.redirect(new URL(`/login?error=${message}`, appOrigin));
   }
 
   const sessionToken: string | undefined = body.session_token;
   if (!sessionToken) {
     // 200인데 토큰이 없으면 계약 위반이다 — approve/route.ts와 같은 원칙.
-    return NextResponse.redirect(new URL("/login?error=missing_session_token", req.url));
+    return NextResponse.redirect(new URL("/login?error=missing_session_token", appOrigin));
   }
 
-  const response = NextResponse.redirect(new URL("/", req.url));
+  const response = NextResponse.redirect(new URL("/", appOrigin));
   response.cookies.set(SESSION_COOKIE_NAME, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

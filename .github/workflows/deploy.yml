@@ -61,6 +61,11 @@ jobs:
           echo "::add-mask::$VALUE"
           echo "value=$VALUE" >> "$GITHUB_OUTPUT"
 
+      # PUBLIC_APP_URL: Cloud Run 컨테이너 내부에서 req.nextUrl.origin이
+      # http://localhost:8080(내부 바인딩 주소)로 나와서, 로그인 페이지가
+      # window.location.origin으로 Google에 보낸 redirect_uri와 서버가 재계산한
+      # 값이 달라져 redirect_uri_mismatch가 났다(google/callback/route.ts).
+      # 이 서비스 자신의 URL은 이름·프로젝트·리전이 고정이라 배포마다 그대로다.
       - run: |
           gcloud run deploy payflow-web \
             --source . \
@@ -68,4 +73,5 @@ jobs:
             --region "$REGION" \
             --service-account "$RUNTIME_SA" \
             --set-build-env-vars "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.client_id.outputs.value }}" \
+            --set-env-vars "PUBLIC_APP_URL=https://payflow-web-1095757595735.asia-northeast3.run.app" \
             --quiet
