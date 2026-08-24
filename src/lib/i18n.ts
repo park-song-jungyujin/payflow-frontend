@@ -49,6 +49,8 @@ export const dict = {
     noRecipientsReason: "No linked claims — cannot approve.",
     multiRecipientReason: "This batch has 2+ recipients — automatic payout isn't supported yet.",
     showAll: (n: number) => `Show all (${n})`,
+    unsettledClaimsTitle: "Unsettled Claims",
+    noUnsettledClaims: "No unsettled claims — all caught up.",
   },
   ko: {
     subtitle: "정산 관리자 대시보드",
@@ -88,6 +90,8 @@ export const dict = {
     noRecipientsReason: "연결된 청구 항목이 없어 승인할 수 없습니다.",
     multiRecipientReason: "이 배치는 수취인이 2명 이상이라 아직 자동 송금을 지원하지 않습니다.",
     showAll: (n: number) => `모두 보기 (${n})`,
+    unsettledClaimsTitle: "미정산 항목",
+    noUnsettledClaims: "미정산 항목이 없습니다.",
   },
 } as const satisfies Record<Locale, Record<string, string | ((n: number) => string)>>;
 
