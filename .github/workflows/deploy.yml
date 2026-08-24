@@ -73,5 +73,5 @@ jobs:
             --region "$REGION" \
             --service-account "$RUNTIME_SA" \
             --set-build-env-vars "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.client_id.outputs.value }}" \
-            --set-env-vars "PUBLIC_APP_URL=https://payflow-web-1095757595735.asia-northeast3.run.app" \
+            --update-env-vars "PUBLIC_APP_URL=https://payflow-web-1095757595735.asia-northeast3.run.app,API_BASE_URL=https://payflow-api-1095757595735.asia-northeast3.run.app" \
             --quiet
