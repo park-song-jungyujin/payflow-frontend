@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 // 결정: redirect_uri는 window.location.origin에서 조립한다 — 환경별로
@@ -9,6 +10,9 @@ const GOOGLE_AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
 
 export default function LoginPage() {
   const [orgName, setOrgName] = useState("");
+  // google/callback/route.ts가 실패 시 여기로 ?error=...를 붙여 리다이렉트한다 —
+  // 표시 안 하면 "로그인 버튼 눌렀는데 그냥 같은 페이지로 돌아온다"로만 보인다.
+  const error = useSearchParams().get("error");
 
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -44,6 +48,7 @@ export default function LoginPage() {
         처음 로그인하면 새 기관이 만들어집니다. 이미 소속된 기관이 있으면
         아래 입력은 무시됩니다.
       </p>
+      {error && <p role="alert">{error}</p>}
       <label>
         기관명(최초 가입 시){" "}
         <input
