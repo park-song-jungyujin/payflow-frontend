@@ -43,16 +43,37 @@ async function getUnsettledClaims(): Promise<ClaimSummary[]> {
   return body.claims ?? [];
 }
 
+// 로그인한 executor/org 표시용. 실패해도(세션 만료 등) 대시보드 자체는 뜨게
+// null만 반환한다 — proxy.ts가 이미 세션 없는 요청은 /login으로 걸러낸다.
+async function getMe(): Promise<{ org_name: string | null; email: string } | null> {
+  const apiBase = process.env.API_BASE_URL;
+  if (!apiBase) return null;
+
+  const res = await fetch(`${apiBase}/auth/me`, {
+    cache: "no-store",
+    headers: await authHeaders(),
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export default async function Home() {
-  const [runs, unsettledClaims, locale] = await Promise.all([
+  const [runs, unsettledClaims, me, locale] = await Promise.all([
     getSettlements(),
     getUnsettledClaims(),
+    getMe(),
     getLocale(),
   ]);
   const s = t(locale);
 
   return (
     <main className="page page-wide">
+      {me && (
+        <p style={{ textAlign: "right" }}>
+          <span className="card-muted">{s.loggedInAs(me.org_name ?? "—", me.email)}</span>{" "}
+          · <a href="/api/auth/logout">{s.logout}</a>
+        </p>
+      )}
       <div className="page-header">
         <h1>Payflow</h1>
         <span className="card-muted">{s.subtitle}</span>

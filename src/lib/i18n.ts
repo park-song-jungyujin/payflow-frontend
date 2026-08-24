@@ -52,6 +52,8 @@ export const dict = {
     noUnsettledClaims: "No unsettled claims — all caught up.",
     slackConnectTitle: "Slack Workspace",
     slackConnectButton: "Add to Slack",
+    loggedInAs: (org: string, email: string) => `${org} · ${email}`,
+    logout: "Log out",
   },
   ko: {
     subtitle: "정산 관리자 대시보드",
@@ -94,8 +96,13 @@ export const dict = {
     noUnsettledClaims: "미정산 항목이 없습니다.",
     slackConnectTitle: "Slack 워크스페이스",
     slackConnectButton: "Slack에 앱 추가",
+    loggedInAs: (org: string, email: string) => `${org} · ${email}`,
+    logout: "로그아웃",
   },
-} as const satisfies Record<Locale, Record<string, string | ((n: number) => string)>>;
+} as const satisfies Record<
+  Locale,
+  Record<string, string | ((n: number) => string) | ((org: string, email: string) => string)>
+>;
 
 export function t(locale: Locale) {
   return dict[locale];
