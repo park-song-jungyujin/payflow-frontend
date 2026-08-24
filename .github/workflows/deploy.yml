@@ -50,10 +50,22 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
+      # NEXT_PUBLIC_*는 next build 시점에 클라이언트 번들에 굽힌다 — Cloud Run의
+      # --set-env-vars(런타임 주입)는 이미 빌드된 번들에 아무 효과가 없다. client
+      # id는 비밀이 아니지만(브라우저 리다이렉트 URL에 그대로 노출) Secret
+      # Manager에 이미 있는 값을 이중 관리하지 않으려고 여기서 읽는다 — web
+      # deployer SA는 GOOGLE_CLIENT_ID 하나만 읽을 권한이 있다(infra/iam.tf).
+      - id: client_id
+        run: |
+          VALUE=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_ID --project="$PROJECT_ID")
+          echo "::add-mask::$VALUE"
+          echo "value=$VALUE" >> "$GITHUB_OUTPUT"
+
       - run: |
           gcloud run deploy payflow-web \
             --source . \
             --project "$PROJECT_ID" \
             --region "$REGION" \
             --service-account "$RUNTIME_SA" \
+            --set-build-env-vars "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.client_id.outputs.value }}" \
             --quiet
