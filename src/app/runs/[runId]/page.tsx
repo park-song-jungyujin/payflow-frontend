@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 import ApproveButton from "./approve-button";
 import StatusPoller from "./status-poller";
 import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
@@ -103,32 +104,38 @@ export default async function RunDetailPage({
             </thead>
             <tbody>
               {run.claims.map((c) => (
-                <tr key={c.claim_id}>
-                  <td>{c.recipient_name}</td>
-                  <td>
-                    {c.merchant_name ?? "-"}
-                    {c.items.length > 0 && (
-                      <ul className="item-list">
-                        {c.items.map((item, i) => (
-                          <li key={i}>
-                            {item.name}
-                            {item.amount_minor !== null && (
-                              <> — {formatMinor(item.amount_minor, c.currency)}</>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </td>
-                  <td>{c.transaction_date ?? "-"}</td>
-                  <td className="amount">
-                    {formatUsd(c.amount_minor, c.currency, run.fx_rates)}
-                    {c.currency === "KRW" && (
-                      <span className="hint"> ({formatMinor(c.amount_minor, c.currency)})</span>
-                    )}
-                  </td>
-                  <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
-                </tr>
+                <Fragment key={c.claim_id}>
+                  <tr className={c.items.length > 0 ? "claim-row has-items" : "claim-row"}>
+                    <td>{c.recipient_name}</td>
+                    <td>{c.merchant_name ?? "-"}</td>
+                    <td>{c.transaction_date ?? "-"}</td>
+                    <td className="amount">
+                      {formatUsd(c.amount_minor, c.currency, run.fx_rates)}
+                      {c.currency === "KRW" && (
+                        <span className="hint"> ({formatMinor(c.amount_minor, c.currency)})</span>
+                      )}
+                    </td>
+                    <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
+                  </tr>
+                  {c.items.length > 0 && (
+                    <tr className="item-row">
+                      <td colSpan={5}>
+                        <ul className="item-list">
+                          {c.items.map((item, i) => (
+                            <li key={i}>
+                              <span className="item-name">{item.name}</span>
+                              {item.amount_minor !== null && (
+                                <span className="item-amount">
+                                  {formatMinor(item.amount_minor, c.currency)}
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>
