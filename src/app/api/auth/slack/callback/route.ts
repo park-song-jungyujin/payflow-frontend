@@ -12,8 +12,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "API_BASE_URL not set" }, { status: 500 });
   }
 
+  // google/callback, logout route.ts와 같은 이유 — Cloud Run에서 req.url이
+  // 컨테이너 내부 바인딩 주소(localhost)로 나와서 그대로 쓰면 Allow 후
+  // localhost로 리다이렉트된다.
+  const appOrigin = process.env.PUBLIC_APP_URL || req.nextUrl.origin;
+
   if (!code) {
-    return NextResponse.redirect(new URL("/?slack_error=missing_code", req.url));
+    return NextResponse.redirect(new URL("/?slack_error=missing_code", appOrigin));
   }
 
   const res = await fetch(`${apiBase}/auth/slack/callback`, {
@@ -25,8 +30,8 @@ export async function GET(req: NextRequest) {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const message = encodeURIComponent(body.detail ?? "slack_install_failed");
-    return NextResponse.redirect(new URL(`/?slack_error=${message}`, req.url));
+    return NextResponse.redirect(new URL(`/?slack_error=${message}`, appOrigin));
   }
 
-  return NextResponse.redirect(new URL("/?slack_connected=1", req.url));
+  return NextResponse.redirect(new URL("/?slack_connected=1", appOrigin));
 }
