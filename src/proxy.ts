@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/lib/session";
 
-// 로그인 세션 없이는 대시보드에 못 들어간다. /login·/api/auth/*·정적 자산은 예외.
-const PUBLIC_PREFIXES = ["/login", "/api/auth"];
+// 로그인 세션 없이는 대시보드에 못 들어간다. /login·/api/auth/*·공개 정책/지원/설치 페이지·정적 자산은 예외.
+const PUBLIC_PREFIXES = ["/login", "/api/auth", "/privacy", "/support", "/install", "/slack"];
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
