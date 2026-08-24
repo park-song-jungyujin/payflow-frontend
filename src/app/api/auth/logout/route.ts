@@ -12,7 +12,11 @@ async function logout(req: NextRequest) {
     }).catch(() => {});
   }
 
-  const response = NextResponse.redirect(new URL("/login", req.url));
+  // google/callback/route.ts와 같은 이유 — Cloud Run에서 req.nextUrl.origin이
+  // 컨테이너 내부 바인딩 주소(localhost)로 나와서 그대로 쓰면 로그아웃 후
+  // localhost로 리다이렉트된다.
+  const appOrigin = process.env.PUBLIC_APP_URL || req.nextUrl.origin;
+  const response = NextResponse.redirect(new URL("/login", appOrigin));
   response.cookies.delete(SESSION_COOKIE_NAME);
   return response;
 }
