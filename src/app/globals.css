@@ -70,6 +70,30 @@ a:hover {
   padding: 32px 20px 64px;
 }
 
+/* 대시보드 홈만 좌우 2단(미정산 항목 + 사이드바)이라 더 넓게 쓴다. */
+.page-wide {
+  max-width: 1180px;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  /* section + section의 margin-top: 28px 규칙이 이미 간격을 준다 — gap 중복 금지. */
+}
+
+@media (max-width: 860px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .page-header {
   display: flex;
   align-items: baseline;
@@ -190,6 +214,20 @@ th.amount {
   border: 1px solid currentColor;
   background: color-mix(in srgb, currentColor 12%, transparent);
   white-space: nowrap;
+}
+
+/* --- receipt item list (claims table) --- */
+
+.item-list {
+  margin: 4px 0 0 1.1em;
+  padding: 0;
+  list-style: disc;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.item-list li {
+  margin-top: 2px;
 }
 
 /* --- anomaly list --- */

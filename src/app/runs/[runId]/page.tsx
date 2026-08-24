@@ -109,7 +109,21 @@ export default async function RunDetailPage({
               {run.claims.map((c) => (
                 <tr key={c.claim_id}>
                   <td>{c.recipient_name}</td>
-                  <td>{c.merchant_name ?? "-"}</td>
+                  <td>
+                    {c.merchant_name ?? "-"}
+                    {c.items.length > 0 && (
+                      <ul className="item-list">
+                        {c.items.map((item, i) => (
+                          <li key={i}>
+                            {item.name}
+                            {item.amount_minor !== null && (
+                              <> — {formatMinor(item.amount_minor, c.currency)}</>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </td>
                   <td>{c.transaction_date ?? "-"}</td>
                   <td className="amount">
                     {formatUsd(c.amount_minor, c.currency, run.fx_rates)}
