@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ApproveButton from "./approve-button";
 import ClaimsTable from "./claims-table";
+import RetryAnalysisButton from "./retry-analysis-button";
 import StatusPoller from "./status-poller";
 import {
   EXECUTOR_ANALYSIS_STATUS_COLOR,
@@ -114,6 +115,16 @@ export default async function RunDetailPage({
             >
               {EXECUTOR_ANALYSIS_STATUS_LABEL[locale][run.executor_analysis.status]}
             </span>
+          )}
+          {/* 승인 이후엔 금액이 고정돼 재분석이 의미가 없다(backend가 DRAFT가 아니면
+              409로 거부한다) — run.status로 먼저 막고, PROCESSING 중 중복 클릭은
+              버튼 disabled로 막는다. */}
+          {run.status === "DRAFT" && (
+            <RetryAnalysisButton
+              runId={run.settlement_run_id}
+              disabled={run.executor_analysis?.status === "PROCESSING"}
+              locale={locale}
+            />
           )}
         </div>
         {run.executor_analysis === null || run.executor_analysis.status === "PROCESSING" ? (

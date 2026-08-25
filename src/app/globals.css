@@ -170,6 +170,21 @@ h2 {
   overflow-wrap: anywhere;
 }
 
+.retry-analysis {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.retry-analysis button {
+  padding: 4px 12px;
+  font-size: 0.82rem;
+}
+
+.retry-analysis [role="alert"] {
+  margin-top: 0;
+}
+
 /* --- table --- */
 
 table {
