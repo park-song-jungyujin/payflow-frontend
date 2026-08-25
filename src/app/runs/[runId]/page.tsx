@@ -4,6 +4,10 @@ import { Fragment } from "react";
 import ApproveButton from "./approve-button";
 import StatusPoller from "./status-poller";
 import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
+import {
+  EXECUTOR_ANALYSIS_STATUS_COLOR,
+  EXECUTOR_ANALYSIS_STATUS_LABEL,
+} from "@/lib/executorAnalysisStatus";
 import { t } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { formatMinor, formatUsd } from "@/lib/money";
@@ -67,7 +71,10 @@ export default async function RunDetailPage({
       <div className="page-header">
         <h1>{run.settlement_run_id}</h1>
       </div>
-      <StatusPoller status={run.status} />
+      <StatusPoller
+        status={run.status}
+        executorAnalysisStatus={run.executor_analysis?.status ?? null}
+      />
 
       <section className="card">
         <div className="meta-row">
@@ -143,9 +150,21 @@ export default async function RunDetailPage({
       </section>
 
       <section>
-        <h2>{s.anomalyTitle}</h2>
-        {run.executor_analysis === null ? (
+        <div className="meta-row">
+          <h2>{s.anomalyTitle}</h2>
+          {run.executor_analysis !== null && (
+            <span
+              className="badge"
+              style={{ color: EXECUTOR_ANALYSIS_STATUS_COLOR[run.executor_analysis.status] }}
+            >
+              {EXECUTOR_ANALYSIS_STATUS_LABEL[locale][run.executor_analysis.status]}
+            </span>
+          )}
+        </div>
+        {run.executor_analysis === null || run.executor_analysis.status === "PROCESSING" ? (
           <p className="card card-muted">{s.analysisPending}</p>
+        ) : run.executor_analysis.status === "FAILED" ? (
+          <p className="card card-muted">{s.analysisFailed}</p>
         ) : (
           <div className={`card${hasAnomalies ? " anomaly-card" : ""}`}>
             {displayedAnomalies.length === 0 ? (

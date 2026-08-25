@@ -9,6 +9,7 @@
 // api.d.ts로 옮긴다.
 
 import type { AccountCategoryCode } from "@/lib/accountCategory";
+import type { ExecutorAnalysisStatus } from "@/lib/executorAnalysisStatus";
 import type { SettlementRunStatus } from "@/lib/settlementStatus";
 
 export interface SettlementFilter {
@@ -37,6 +38,7 @@ export interface ClaimSummary {
 }
 
 export interface ExecutorAnalysis {
+  status: ExecutorAnalysisStatus;
   anomalies: string[];
   summary_text: string | null;
   // 영어 사용자용 병행 필드. anomalies_en은 anomalies와 같은 개수·순서(백엔드가
