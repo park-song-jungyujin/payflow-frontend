@@ -45,7 +45,12 @@ export default async function RunDetailPage({
   // 제거됐다(feat/multi-recipient-payout, PR #25) — 이제 recipient당 item으로
   // 단일 배치 전송을 지원하므로 여기서 더 이상 막지 않는다.
   const recipientIds = new Set(run.claims.map((c) => c.recipient_id));
-  const disabledReason = recipientIds.size === 0 ? s.noRecipientsReason : undefined;
+  const analysisInProgress = run.executor_analysis?.status === "PROCESSING";
+  const disabledReason = analysisInProgress
+    ? s.analysisInProgressReason
+    : recipientIds.size === 0
+      ? s.noRecipientsReason
+      : undefined;
 
   const canApprove = run.status === "DRAFT" || run.status === "FAILED";
 
