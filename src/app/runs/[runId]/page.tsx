@@ -10,7 +10,7 @@ import {
 } from "@/lib/executorAnalysisStatus";
 import { t } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
-import { formatUsd } from "@/lib/money";
+import { formatMinor, formatUsd, toUsdMinor } from "@/lib/money";
 import { authHeaders } from "@/lib/session";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRun } from "@/types/settlement";
@@ -54,6 +54,17 @@ export default async function RunDetailPage({
 
   const canApprove = run.status === "DRAFT" || run.status === "FAILED";
 
+  // total_amount_minor는 DRAFT 동안 0으로 저장돼 있다(settlements/routes.py
+  // TEMP(B) — guards/routes.py._lock_fx_and_total이 승인 시점에야 처음 계산한다).
+  // 그 값을 그대로 보여주면 "잠정치" 안내 문구와 달리 claim이 있어도 항상
+  // 0으로 보여 오류처럼 읽힌다 — DRAFT일 때만 화면에서 claim별 USD 환산 추정치
+  // (각 표 행이 이미 쓰는 toUsdMinor)를 더해 잠정 합계를 만든다. 실제 승인·송금
+  // 금액과는 무관한 표시 전용 값이다.
+  const draftProvisionalTotalMinor =
+    run.status === "DRAFT"
+      ? run.claims.reduce((sum, c) => sum + toUsdMinor(c.amount_minor, c.currency, run.fx_rates), 0)
+      : null;
+
   const hasAnomalies =
     run.executor_analysis !== null && run.executor_analysis.anomalies.length > 0;
 
@@ -92,7 +103,9 @@ export default async function RunDetailPage({
           <span>
             {s.totalLabel}:{" "}
             <span className="value">
-              {formatUsd(run.total_amount_minor, run.base_currency, run.fx_rates)}
+              {draftProvisionalTotalMinor !== null
+                ? formatMinor(draftProvisionalTotalMinor, "USD")
+                : formatUsd(run.total_amount_minor, run.base_currency, run.fx_rates)}
             </span>
           </span>
         </div>
