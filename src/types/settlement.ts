@@ -25,6 +25,8 @@ export interface ReceiptItem {
   amount_minor: number | null;
   // 없으면 false 취급(기존 run의 items에는 이 필드가 없다).
   excluded?: boolean;
+  // 파싱 시점에 Gemma로 미리 번역해 둔 영어. 번역 실패 시 필드 자체가 없다.
+  name_en?: string;
 }
 
 export interface ClaimSummary {
@@ -35,6 +37,9 @@ export interface ClaimSummary {
   currency: string;
   account_category_code: AccountCategoryCode;
   merchant_name: string | null;
+  // merchant_name과 같은 이유로 파싱 시점에 미리 번역해 둔다 — items[].name_en과
+  // 같은 정책. 번역 실패/미시도 시 null.
+  merchant_name_en: string | null;
   transaction_date: string | null;
   items: ReceiptItem[];
 }

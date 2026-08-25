@@ -79,7 +79,7 @@ export default function ClaimsTable({
             <Fragment key={c.claim_id}>
               <tr className={c.items.length > 0 ? "claim-row has-items" : "claim-row"}>
                 <td>{c.recipient_name}</td>
-                <td>{c.merchant_name ?? "-"}</td>
+                <td>{(locale === "en" && c.merchant_name_en) || c.merchant_name || "-"}</td>
                 <td>{c.transaction_date ?? "-"}</td>
                 <td className="amount">
                   {formatUsd(c.amount_minor, c.currency, fxRates)}
@@ -107,7 +107,7 @@ export default function ClaimsTable({
                               />
                             )}
                             <span className={`item-name${item.excluded ? " item-excluded" : ""}`}>
-                              {item.name}
+                              {(locale === "en" && item.name_en) || item.name}
                             </span>
                             {item.amount_minor !== null && (
                               <span className={`item-amount${item.excluded ? " item-excluded" : ""}`}>

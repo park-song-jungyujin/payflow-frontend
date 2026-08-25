@@ -44,7 +44,7 @@ export default function UnsettledClaimsList({
           {visibleClaims.map((c) => (
             <tr key={c.claim_id}>
               <td>{c.recipient_name}</td>
-              <td>{c.merchant_name ?? "-"}</td>
+              <td>{(locale === "en" && c.merchant_name_en) || c.merchant_name || "-"}</td>
               <td>{c.transaction_date ?? "-"}</td>
               <td className="amount">
                 {formatUsd(c.amount_minor, c.currency)}
