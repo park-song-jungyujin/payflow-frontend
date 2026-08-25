@@ -23,6 +23,8 @@ export interface SettlementFilter {
 export interface ReceiptItem {
   name: string;
   amount_minor: number | null;
+  // 없으면 false 취급(기존 run의 items에는 이 필드가 없다).
+  excluded?: boolean;
 }
 
 export interface ClaimSummary {

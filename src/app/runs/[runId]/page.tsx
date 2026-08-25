@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Fragment } from "react";
 import ApproveButton from "./approve-button";
+import ClaimsTable from "./claims-table";
 import StatusPoller from "./status-poller";
-import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
 import {
   EXECUTOR_ANALYSIS_STATUS_COLOR,
   EXECUTOR_ANALYSIS_STATUS_LABEL,
 } from "@/lib/executorAnalysisStatus";
 import { t } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
-import { formatMinor, formatUsd } from "@/lib/money";
+import { formatUsd } from "@/lib/money";
 import { authHeaders } from "@/lib/session";
 import { SETTLEMENT_STATUS_COLOR, SETTLEMENT_STATUS_LABEL } from "@/lib/settlementStatus";
 import type { SettlementRun } from "@/types/settlement";
@@ -96,57 +95,13 @@ export default async function RunDetailPage({
 
       <section>
         <h2>{s.claimsTitle}</h2>
-        {run.claims.length === 0 ? (
-          <p className="card card-muted">{s.noClaims}</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>{s.colRequester}</th>
-                <th>{s.colMerchant}</th>
-                <th>{s.colTxDate}</th>
-                <th className="amount">{s.colAmount}</th>
-                <th>{s.colCategory}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {run.claims.map((c) => (
-                <Fragment key={c.claim_id}>
-                  <tr className={c.items.length > 0 ? "claim-row has-items" : "claim-row"}>
-                    <td>{c.recipient_name}</td>
-                    <td>{c.merchant_name ?? "-"}</td>
-                    <td>{c.transaction_date ?? "-"}</td>
-                    <td className="amount">
-                      {formatUsd(c.amount_minor, c.currency, run.fx_rates)}
-                      {c.currency === "KRW" && (
-                        <span className="hint"> ({formatMinor(c.amount_minor, c.currency)})</span>
-                      )}
-                    </td>
-                    <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
-                  </tr>
-                  {c.items.length > 0 && (
-                    <tr className="item-row">
-                      <td colSpan={5}>
-                        <ul className="item-list">
-                          {c.items.map((item, i) => (
-                            <li key={i}>
-                              <span className="item-name">{item.name}</span>
-                              {item.amount_minor !== null && (
-                                <span className="item-amount">
-                                  {formatMinor(item.amount_minor, c.currency)}
-                                </span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <ClaimsTable
+          runId={run.settlement_run_id}
+          claims={run.claims}
+          fxRates={run.fx_rates}
+          canEditItems={run.status === "DRAFT"}
+          locale={locale}
+        />
       </section>
 
       <section>

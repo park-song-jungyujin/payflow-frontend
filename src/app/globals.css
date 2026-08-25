@@ -260,6 +260,25 @@ tr.item-row td {
   font-variant-numeric: tabular-nums;
 }
 
+/* 체크박스가 있는 항목은 "–" 대신 체크박스가 그 자리를 채운다 (청구 반려) */
+.item-list li.has-checkbox {
+  padding-left: 0;
+  align-items: center;
+}
+
+.item-list li.has-checkbox::before {
+  content: none;
+}
+
+.item-list li.has-checkbox input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+
+.item-excluded {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
 /* --- anomaly list --- */
 
 .anomaly-card {

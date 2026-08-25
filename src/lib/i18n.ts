@@ -34,6 +34,9 @@ export const dict = {
     draftHint: "(Provisional total — recalculated with the exchange rate at approval time.)",
     claimsTitle: "Claim Details",
     noClaims: "No claims linked to this run.",
+    itemIncludeLabel: (name: string) => `Include ${name} in settlement amount`,
+    itemToggleFailed: (status: number) => `Failed to update item (${status})`,
+    itemToggleNetworkError: "Network error while updating the item.",
     colMerchant: "Merchant",
     colTxDate: "Date",
     colCategory: "Category",
@@ -91,6 +94,9 @@ export const dict = {
     draftHint: "(승인 전 잠정치 — 승인 시점 환율로 다시 계산됩니다)",
     claimsTitle: "정산 명세",
     noClaims: "연결된 청구 항목이 없습니다.",
+    itemIncludeLabel: (name: string) => `${name}을(를) 정산 금액에 포함`,
+    itemToggleFailed: (status: number) => `물품 상태 변경 실패 (${status})`,
+    itemToggleNetworkError: "물품 상태 변경 중 네트워크 오류가 발생했습니다.",
     colMerchant: "가맹점",
     colTxDate: "거래일",
     colCategory: "계정과목",
@@ -127,7 +133,13 @@ export const dict = {
   },
 } as const satisfies Record<
   Locale,
-  Record<string, string | ((n: number) => string) | ((org: string, email: string) => string)>
+  Record<
+    string,
+    | string
+    | ((n: number) => string)
+    | ((org: string, email: string) => string)
+    | ((name: string) => string)
+  >
 >;
 
 export function t(locale: Locale) {
