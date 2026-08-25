@@ -163,6 +163,13 @@ h2 {
   margin-top: 6px;
 }
 
+/* 에이전트 enqueue 실패 사유 — 원문(예외 문자열)이라 줄바꿈·가로 스크롤을 허용한다. */
+.failure-reason {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
 /* --- table --- */
 
 table {

@@ -119,7 +119,13 @@ export default async function RunDetailPage({
         {run.executor_analysis === null || run.executor_analysis.status === "PROCESSING" ? (
           <p className="card card-muted">{s.analysisPending}</p>
         ) : run.executor_analysis.status === "FAILED" ? (
-          <p className="card card-muted">{s.analysisFailed}</p>
+          <div className="card card-muted">
+            <p>{s.analysisFailed}</p>
+            {/* 백엔드가 실패 사유를 실어 보낸다 — 없으면(구 draft) 문구만 남는다. */}
+            {run.executor_analysis.reason && (
+              <p className="hint failure-reason">{run.executor_analysis.reason}</p>
+            )}
+          </div>
         ) : (
           <div className={`card${hasAnomalies ? " anomaly-card" : ""}`}>
             {displayedAnomalies.length === 0 ? (

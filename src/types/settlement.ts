@@ -48,6 +48,9 @@ export interface ExecutorAnalysis {
   // _executor_analysis 참조).
   anomalies_en: string[];
   summary_text_en: string | null;
+  // status가 FAILED일 때만 채워진다 — 분석 요청(Cloud Task) 생성이 왜 실패했는지.
+  // 정상 분석 결과에는 없어서 null이다(settlements/routes.py _executor_analysis).
+  reason: string | null;
   created_at: string;
 }
 
