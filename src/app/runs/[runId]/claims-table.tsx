@@ -58,6 +58,33 @@ export default function ClaimsTable({
     }
   }
 
+  // 물품 반려(toggleItem)와 달리 claim 하나를 통째로 이 run에서 뺀다 —
+  // 재청구 의심(중복·기송금) claim처럼 특정 물품이 아니라 claim 자체가
+  // 문제일 때 쓴다(backend가 CONFIRMED로 되돌려 다음 정산 실행 후보로
+  // 다시 잡힐 수 있게 한다). 되돌릴 수 없어 누르기 전에 한 번 확인한다.
+  async function excludeClaim(claimId: string) {
+    if (!window.confirm(s.excludeClaimConfirm)) return;
+    setPending(claimId);
+    setError(null);
+    try {
+      const res = await fetch(`/api/settlements/runs/${runId}/claims/${claimId}/exclude`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setError(body.detail ?? body.error ?? s.excludeClaimFailed(res.status));
+        return;
+      }
+      setClaims((prev) => prev.filter((c) => c.claim_id !== claimId));
+    } catch {
+      setError(s.itemToggleNetworkError);
+    } finally {
+      setPending(null);
+    }
+  }
+
   if (claims.length === 0) {
     return <p className="card card-muted">{s.noClaims}</p>;
   }
@@ -72,6 +99,7 @@ export default function ClaimsTable({
             <th>{s.colTxDate}</th>
             <th className="amount">{s.colAmount}</th>
             <th>{s.colCategory}</th>
+            {canEditItems && <th></th>}
           </tr>
         </thead>
         <tbody>
@@ -88,10 +116,22 @@ export default function ClaimsTable({
                   )}
                 </td>
                 <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
+                {canEditItems && (
+                  <td>
+                    <button
+                      type="button"
+                      className="btn-outline"
+                      disabled={pending === c.claim_id}
+                      onClick={() => excludeClaim(c.claim_id)}
+                    >
+                      {pending === c.claim_id ? s.excluding : s.excludeClaimButton}
+                    </button>
+                  </td>
+                )}
               </tr>
               {c.items.length > 0 && (
                 <tr className="item-row">
-                  <td colSpan={5}>
+                  <td colSpan={canEditItems ? 6 : 5}>
                     <ul className="item-list">
                       {c.items.map((item, i) => {
                         const key = `${c.claim_id}:${i}`;
