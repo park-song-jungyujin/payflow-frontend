@@ -119,6 +119,7 @@ export default async function RunDetailPage({
           claims={run.claims}
           fxRates={run.fx_rates}
           canEditItems={run.status === "DRAFT"}
+          canExcludeClaims={run.status === "DRAFT"}
           locale={locale}
         />
       </section>
