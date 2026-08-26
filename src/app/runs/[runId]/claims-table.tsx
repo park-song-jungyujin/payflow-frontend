@@ -5,7 +5,6 @@ import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
 import { t, type Locale } from "@/lib/i18n";
 import { formatMinor, formatUsd } from "@/lib/money";
 import type { ClaimSummary, ReceiptItem } from "@/types/settlement";
-import ExcludeClaimButton from "./exclude-claim-button";
 
 // 청구 반려 — DRAFT 상태에서만 물품 체크를 해제할 수 있다(승인 이후엔
 // approval_amount_hash가 금액을 이미 고정한다). 서버가 돌려주는 amount_minor를
@@ -15,14 +14,12 @@ export default function ClaimsTable({
   claims: initialClaims,
   fxRates,
   canEditItems,
-  canExcludeClaims,
   locale,
 }: {
   runId: string;
   claims: ClaimSummary[];
   fxRates: Record<string, string>;
   canEditItems: boolean;
-  canExcludeClaims: boolean;
   locale: Locale;
 }) {
   const s = t(locale);
@@ -75,7 +72,6 @@ export default function ClaimsTable({
             <th>{s.colTxDate}</th>
             <th className="amount">{s.colAmount}</th>
             <th>{s.colCategory}</th>
-            {canExcludeClaims && <th></th>}
           </tr>
         </thead>
         <tbody>
@@ -92,15 +88,10 @@ export default function ClaimsTable({
                   )}
                 </td>
                 <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
-                {canExcludeClaims && (
-                  <td>
-                    <ExcludeClaimButton runId={runId} claimId={c.claim_id} locale={locale} />
-                  </td>
-                )}
               </tr>
               {c.items.length > 0 && (
                 <tr className="item-row">
-                  <td colSpan={canExcludeClaims ? 6 : 5}>
+                  <td colSpan={5}>
                     <ul className="item-list">
                       {c.items.map((item, i) => {
                         const key = `${c.claim_id}:${i}`;
