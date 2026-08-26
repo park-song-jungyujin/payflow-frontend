@@ -81,6 +81,16 @@ export default async function RunDetailPage({
       ? run.executor_analysis.summary_text_ko
       : (run.executor_analysis?.summary_text ?? null);
 
+  // 분석 자체(DONE)는 끝났지만 한국어 번역은 백그라운드 Cloud Task가 아직
+  // 못 채웠을 수 있다(guards/agent_drafts.py._enqueue_executor_translation) —
+  // ko 로케일에서만 의미가 있다. StatusPoller가 이 값을 보고 잠깐 더 폴링해
+  // 번역이 도착하면 영어에서 한국어로 자연스럽게 바뀐다.
+  const waitingForKoreanTranslation =
+    locale === "ko" &&
+    run.executor_analysis !== null &&
+    run.executor_analysis.status === "DONE" &&
+    run.executor_analysis.summary_text_ko === null;
+
   return (
     <main className="page">
       <Link href="/" className="back-link">
@@ -92,6 +102,7 @@ export default async function RunDetailPage({
       <StatusPoller
         status={run.status}
         executorAnalysisStatus={run.executor_analysis?.status ?? null}
+        waitingForKoreanTranslation={waitingForKoreanTranslation}
       />
 
       <section className="card">
