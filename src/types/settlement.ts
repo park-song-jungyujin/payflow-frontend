@@ -21,7 +21,12 @@ export interface SettlementFilter {
 }
 
 export interface ReceiptItem {
+  // 영수증에서 읽은 원문(마스킹 후). 거의 항상 한국어다.
   name: string;
+  // name의 영어 번역. 파싱 시점에 Gemma가 채운다(api parsing/pipeline.py
+  // _build_items). 번역이 실패했거나 이 필드가 생기기 전에 파싱된 영수증에는
+  // 없다 — 표시할 땐 lib/receiptItem.ts itemDisplayName으로 폴백을 태운다.
+  name_en?: string;
   amount_minor: number | null;
   // 없으면 false 취급(기존 run의 items에는 이 필드가 없다).
   excluded?: boolean;
@@ -35,6 +40,10 @@ export interface ClaimSummary {
   currency: string;
   account_category_code: AccountCategoryCode;
   merchant_name: string | null;
+  // merchant_name의 영어 번역. 파싱 시점에 Gemma가 채운다(api parsing/pipeline.py
+  // _translate_receipt_names). 번역 실패나 이 필드가 생기기 전에 파싱된 영수증엔
+  // null — 표시할 땐 lib/receiptText.ts merchantDisplay로 폴백을 태운다.
+  merchant_name_en: string | null;
   transaction_date: string | null;
   items: ReceiptItem[];
 }
