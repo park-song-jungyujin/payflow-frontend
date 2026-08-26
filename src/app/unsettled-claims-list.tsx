@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
 import { t, type Locale } from "@/lib/i18n";
 import { formatMinor, formatUsd } from "@/lib/money";
+import { merchantDisplay } from "@/lib/receiptText";
 import type { ClaimSummary } from "@/types/settlement";
 
 const VISIBLE_LIMIT = 10;
@@ -41,20 +42,31 @@ export default function UnsettledClaimsList({
           </tr>
         </thead>
         <tbody>
-          {visibleClaims.map((c) => (
-            <tr key={c.claim_id}>
-              <td>{c.recipient_name}</td>
-              <td>{c.merchant_name ?? "-"}</td>
-              <td>{c.transaction_date ?? "-"}</td>
-              <td className="amount">
-                {formatUsd(c.amount_minor, c.currency)}
-                {c.currency === "KRW" && (
-                  <span className="hint"> ({formatMinor(c.amount_minor, c.currency)})</span>
-                )}
-              </td>
-              <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
-            </tr>
-          ))}
+          {visibleClaims.map((c) => {
+            // 정산 실행 상세 표(runs/[runId]/claims-table.tsx)와 같은 규칙 —
+            // en 로케일에선 번역명을 쓰고 그 아래 회색으로 영수증 원문 상호를
+            // 덧붙인다. 같은 가맹점이 두 화면에서 다르게 보이면 안 된다.
+            const merchant = merchantDisplay(c.merchant_name, c.merchant_name_en, locale);
+            return (
+              <tr key={c.claim_id}>
+                <td>{c.recipient_name}</td>
+                <td>
+                  {merchant.primary ?? "-"}
+                  {merchant.original && (
+                    <span className="merchant-original">({merchant.original})</span>
+                  )}
+                </td>
+                <td>{c.transaction_date ?? "-"}</td>
+                <td className="amount">
+                  {formatUsd(c.amount_minor, c.currency)}
+                  {c.currency === "KRW" && (
+                    <span className="hint"> ({formatMinor(c.amount_minor, c.currency)})</span>
+                  )}
+                </td>
+                <td>{ACCOUNT_CATEGORY_LABEL[locale][c.account_category_code]}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       {!showAll && claims.length > VISIBLE_LIMIT && (
