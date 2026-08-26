@@ -277,6 +277,14 @@ tr.item-row td {
   flex: 1;
 }
 
+/* 가맹점명 영어 번역 아래에 붙는 영수증 원문 상호 — 번역명이 주(主)이고
+   이건 대조용 참고값이라 한 단계 흐리게, 한 줄 아래에 그린다. */
+.merchant-original {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 .item-amount {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
