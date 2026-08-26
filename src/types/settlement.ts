@@ -41,13 +41,14 @@ export interface ClaimSummary {
 
 export interface ExecutorAnalysis {
   status: ExecutorAnalysisStatus;
+  // 집행자 에이전트가 직접 쓰는 기본 필드 — 영어다(해커톤 제출 언어 요건).
   anomalies: string[];
   summary_text: string | null;
-  // 영어 사용자용 병행 필드. anomalies_en은 anomalies와 같은 개수·순서(백엔드가
-  // 없는 draft엔 빈 리스트/null로 기본값을 채운다 — settlements/routes.py
-  // _executor_analysis 참조).
-  anomalies_en: string[];
-  summary_text_en: string | null;
+  // 한국어 사용자용 병행 필드. Gemma가 번역해 채운다(guards/agent_drafts.py).
+  // anomalies_ko는 anomalies와 같은 개수·순서 — 번역 실패나 없는 draft엔
+  // 빈 리스트/null로 기본값을 채운다(settlements/routes.py _executor_analysis).
+  anomalies_ko: string[];
+  summary_text_ko: string | null;
   // status가 FAILED일 때만 채워진다 — 분석 요청(Cloud Task) 생성이 왜 실패했는지.
   // 정상 분석 결과에는 없어서 null이다(settlements/routes.py _executor_analysis).
   reason: string | null;

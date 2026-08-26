@@ -68,15 +68,17 @@ export default async function RunDetailPage({
   const hasAnomalies =
     run.executor_analysis !== null && run.executor_analysis.anomalies.length > 0;
 
-  // agent가 anomalies_en/summary_text_en을 채우기 전에 쓰인 draft는 이 필드가
-  // 비어 있다 — 그럴 땐 en 선택 시에도 한국어로 대체 표시한다(빈 화면보다 낫다).
+  // 집행자 에이전트는 이제 anomalies/summary_text 자체를 영어로 쓴다(해커톤
+  // 제출 언어 요건) — ko 로케일일 때만 Gemma가 번역한 anomalies_ko/summary_text_ko를
+  // 우선 쓴다. 번역이 실패했거나 그 필드 추가 전에 쓰인 draft는 이 값이 비어
+  // 있다 — 그럴 땐 ko 선택 시에도 영어로 대체 표시한다(빈 화면보다 낫다).
   const displayedAnomalies =
-    locale === "en" && run.executor_analysis && run.executor_analysis.anomalies_en.length > 0
-      ? run.executor_analysis.anomalies_en
+    locale === "ko" && run.executor_analysis && run.executor_analysis.anomalies_ko.length > 0
+      ? run.executor_analysis.anomalies_ko
       : (run.executor_analysis?.anomalies ?? []);
   const displayedSummary =
-    locale === "en" && run.executor_analysis?.summary_text_en
-      ? run.executor_analysis.summary_text_en
+    locale === "ko" && run.executor_analysis?.summary_text_ko
+      ? run.executor_analysis.summary_text_ko
       : (run.executor_analysis?.summary_text ?? null);
 
   return (
