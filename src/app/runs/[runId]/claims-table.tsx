@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { ACCOUNT_CATEGORY_LABEL } from "@/lib/accountCategory";
 import { t, type Locale } from "@/lib/i18n";
@@ -24,6 +25,7 @@ export default function ClaimsTable({
   locale: Locale;
 }) {
   const s = t(locale);
+  const router = useRouter();
   const [claims, setClaims] = useState(initialClaims);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +54,9 @@ export default function ClaimsTable({
           c.claim_id === claimId ? { ...c, amount_minor: body.amount_minor, items: body.items } : c
         )
       );
+      // 상단 Total(page.tsx)은 서버 컴포넌트가 최초 로드 시 계산한 값이라
+      // 이 컴포넌트의 로컬 state 갱신만으론 안 바뀐다 — run을 다시 불러와야 한다.
+      router.refresh();
     } catch {
       setError(s.itemToggleNetworkError);
     } finally {
